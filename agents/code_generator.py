@@ -1,10 +1,6 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
 import datetime
 import json
-import re
 import google.generativeai as genai
 from pathlib import Path
 
@@ -52,8 +48,7 @@ def extract_prompt_from_event():
 
 
 def main():
-    prompt = "write a very detailed floppy bird game"
-    #prompt = extract_prompt_from_event()
+    prompt = extract_prompt_from_event()
     generated_code = generate_code_from_prompt(prompt)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = OUTPUT_DIR / f"{timestamp}_generated.py"
