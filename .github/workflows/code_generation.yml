@@ -1,0 +1,44 @@
+name: Code Generation Agent
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [labeled, opened, edited]
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '0 * * * *'  # runs every hour
+
+jobs:
+  generate-code:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event.label.name == 'code-gen-request' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code'))
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run code generator
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python agents/code_generator.py
+
+      - name: Commit generated code
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add generated_code/
+          git commit -m "🤖 Generated code via Code Generation Agent"
+          git push

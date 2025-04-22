@@ -1,0 +1,14 @@
+# config.yaml
+
+# Path settings
+generated_code_path: "generated_code/"
+review_reports_path: "review_reports/"
+flagged_code_path: "flagged_code/"
+
+# Gemini API configuration
+gemini_api_key: "YOUR_API_KEY"  # To be set via environment variable in GitHub Actions
+
+# Linting Configuration for Code Review Agent
+linting:
+  max_line_length: 79  # Maximum allowed line length for Python files
+  ignore_warnings: true  # Set to false to treat warnings as errors
