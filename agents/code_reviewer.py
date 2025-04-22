@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 import os
 import datetime
 import subprocess
@@ -21,7 +18,7 @@ def run_lint_check(filepath):
 
 def review_files():
     log_file = REVIEW_DIR / f"{datetime.datetime.now():%Y%m%d_%H%M%S}_review.md"
-    with open(log_file, "w", encoding="utf-8") as log:  # Ensure log file uses UTF-8 encoding
+    with open(log_file, "w", encoding="utf-8") as log:
         for root, _, files in os.walk("."):
             for file in files:
                 if file.endswith(".py") and not root.startswith("./agents"):
@@ -30,8 +27,7 @@ def review_files():
                     if issues:
                         log.write(f"## {filepath}\n```\n{issues}\n```\n\n")
                         flagged_copy = FLAGGED_DIR / f"{file}_flagged.py"
-                        # Open source file with UTF-8 encoding
-                        with open(filepath, "r", encoding="utf-8", errors="ignore") as src, open(flagged_copy, "w", encoding="utf-8") as dst:
+                        with open(filepath, "r", encoding="utf-8") as src, open(flagged_copy, "w", encoding="utf-8") as dst:
                             dst.write(src.read())
     print(f"✅ Review completed. Logs saved to {log_file}")
 
