@@ -1,3 +1,4 @@
+# .github/workflows/code_review.yml
 name: Code Review Agent
 
 on:
@@ -35,6 +36,6 @@ jobs:
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add flagged_code/ || true
-          git commit -m "🔍 Added flagged code from review" || echo "No flagged code to commit"
+          git add flagged_code/ review_reports/ || true
+          git commit -m "🔍 Added flagged code and review report" || echo "No flagged files to commit"
           git push || echo "Nothing to push"
