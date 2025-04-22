@@ -1,21 +1,15 @@
-# .github/workflows/code_generation.yml
 name: Code Generation Agent
 
 on:
   workflow_dispatch:
-  issues:
-    types: [labeled, opened, edited]
   issue_comment:
     types: [created]
-  schedule:
-    - cron: '0 * * * *'  # runs every hour
 
 jobs:
   generate-code:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event.label.name == 'code-gen-request') ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code'))
 
     steps:
