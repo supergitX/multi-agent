@@ -2,22 +2,25 @@ name: Code Generation Agent
 
 on:
   workflow_dispatch:
-  issues:
-    types: [labeled, opened, edited]
   issue_comment:
     types: [created]
+  issues:
+    types: [labeled]
   schedule:
-    - cron: '0 * * * *'  # runs every hour
+    - cron: '0 * * * *'  # Every hour
 
 jobs:
   generate-code:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'workflow_dispatch' ||
-      github.event.label.name == 'code-gen-request' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code'))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code')) ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'code-gen-request')
 
     steps:
+      - name: Print GitHub event payload (for debugging)
+        run: cat $GITHUB_EVENT_PATH
+
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -40,5 +43,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add generated_code/
-          git commit -m "🤖 Generated code via Code Generation Agent"
-          git push
+          git commit -m "🤖 Generated code via Code Generation Agent" || echo "No changes to commit"
+          git push || echo "Nothing to push"
