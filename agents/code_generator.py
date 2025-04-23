@@ -1,25 +1,24 @@
-"""from dotenv import load_dotenv
-load_dotenv()
-import re"""
 import os
 import datetime
 import json
+import re
 import google.generativeai as genai
 from pathlib import Path
 
 OUTPUT_DIR = Path("generated_code")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
-# Gemini API setup
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Gemini API setup: API key should be provided via GitHub Secrets as environment variable 'GEMINI_API_KEY'
+api_key = os.getenv("GEMINI_API_KEY")
+if not api_key:
+    raise EnvironmentError("GEMINI_API_KEY environment variable not set.")
+genai.configure(api_key=api_key)
 
 def generate_code_from_prompt(prompt: str) -> str:
     # Directive to ensure code-only output
     directive = (
         "You are a code generation assistant. "
         "When responding, output only the requested code snippet without any additional explanation or commentary."
-        " The code should be in Python and should be complete and functional. "
-        "If the code is too long, break it into smaller parts and return them one by one. "
     )
     full_prompt = directive + "\n" + prompt
     model = genai.GenerativeModel("models/gemini-2.0-flash")
@@ -30,7 +29,6 @@ def generate_code_from_prompt(prompt: str) -> str:
     fence_match = re.search(r"```(?:python)?\n([\s\S]*?)```", text)
     if fence_match:
         return fence_match.group(1).strip()
-    # Otherwise, assume the entire response is code
     return text
 
 
@@ -51,8 +49,7 @@ def extract_prompt_from_event():
 
 
 def main():
-    prompt = "Write a program to make a working calculator"  # Default prompt for local testing
-    #prompt = extract_prompt_from_event()
+    prompt = extract_prompt_from_event()
     generated_code = generate_code_from_prompt(prompt)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = OUTPUT_DIR / f"{timestamp}_generated.py"
