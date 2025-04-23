@@ -1,19 +1,30 @@
+# .github/workflows/code_generation.yml
 name: Code Generation Agent
+
+# Grant write permission for pushing commits\N    permissions:
+      contents: write
 
 on:
   workflow_dispatch:
   issues:
-    types: [opened, edited]
+    types: [opened, edited, reopened]
   pull_request:
-    types: [opened, edited]
+    types: [opened, edited, reopened]
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '0 * * * *'  # every hour
 
 jobs:
   generate-code:
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -29,11 +40,14 @@ jobs:
         run: |
           python agents/code_generator.py
 
-      - name: Commit generated code
+      - name: Git pull before commit
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git pull origin main || true
+          git pull origin ${{ github.ref_name }} --rebase || true
+
+      - name: Commit generated code
+        run: |
           git add generated_code/
-          git commit -m "🤖 Generated code via Code Generation Agent" || echo "Nothing to commit"
-          git push || echo "Nothing to push"
+          git commit -m "🤖 Generated code via Code Generation Agent" || echo "No changes to commit"
+          git push
