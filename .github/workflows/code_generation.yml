@@ -1,16 +1,22 @@
+# .github/workflows/code_generation.yml
 name: Code Generation Agent
 
 on:
   workflow_dispatch:
   issue_comment:
     types: [created]
+  issues:
+    types: [labeled, opened, edited]
+  schedule:
+    - cron: '0 * * * *'  # every hour
 
 jobs:
   generate-code:
     runs-on: ubuntu-latest
-    if: |
+    if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code'))
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code')) ||
+      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'code-gen-request')
 
     steps:
       - name: Checkout code
@@ -24,16 +30,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate code
+      - name: Run code generator
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python agents/code_generator.py
 
-      - name: Commit generated code
+      - name: Git pull before commit
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
+          git pull origin ${{ github.ref_name }} --rebase
+
+      - name: Commit generated code
+        run: |
           git add generated_code/
-          git commit -m "🤖 Added generated code"
+          git commit -m "🤖 Generated code via Code Generation Agent" || echo "No changes to commit"
           git push

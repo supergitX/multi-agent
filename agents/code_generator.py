@@ -1,3 +1,6 @@
+"""from dotenv import load_dotenv
+load_dotenv()
+import re"""
 import os
 import datetime
 import json
@@ -48,7 +51,8 @@ def extract_prompt_from_event():
 
 
 def main():
-    prompt = extract_prompt_from_event()
+    prompt = "Write a program to make a working calculator"  # Default prompt for local testing
+    #prompt = extract_prompt_from_event()
     generated_code = generate_code_from_prompt(prompt)
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = OUTPUT_DIR / f"{timestamp}_generated.py"

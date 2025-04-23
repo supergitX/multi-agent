@@ -3,6 +3,8 @@ name: Code Review Agent
 
 on:
   push:
+    paths:
+      - 'generated_code/**'
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -32,10 +34,14 @@ jobs:
           name: code-review-logs
           path: review_reports/
 
-      - name: Commit flagged code (if any)
+      - name: Git pull before commit
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add flagged_code/ review_reports/ || true
-          git commit -m "🔍 Added flagged code and review report" || echo "No flagged files to commit"
+          git pull origin ${{ github.ref_name }} --rebase
+
+      - name: Commit flagged code (if any)
+        run: |
+          git add flagged_code/ || true
+          git commit -m "🔍 Added flagged code from review" || echo "No flagged code to commit"
           git push || echo "Nothing to push"
