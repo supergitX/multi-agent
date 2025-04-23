@@ -1,18 +1,17 @@
-# .github/workflows/code_review.yml
 name: Code Review Agent
 
-# Grant write permission for pushing commits
 permissions:
   contents: write
 
 on:
   push:
     paths:
-      - '**/*.py'
+      - 'generated_code/**'
+      - 'agents/**'
+      - '*.py'
+      - '**.py'
   schedule:
     - cron: '0 */2 * * *'  # every 2 hours
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   review-code:
@@ -20,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,7 +31,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run code review
+      - name: Run code reviewer
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python agents/code_reviewer.py
 
@@ -42,8 +43,8 @@ jobs:
           git config user.email github-actions@github.com
           git pull origin ${{ github.ref_name }} --rebase || true
 
-      - name: Commit flagged code and reports
+      - name: Commit review results
         run: |
-          git add flagged_code/ review_reports/
-          git commit -m "🔍 Added flagged code and review reports" || echo "No flagged files to commit"
+          git add review_reports/ flagged_code/ || true
+          git commit -m "🔍 Reviewed code and flagged issues" || echo "No review updates to commit"
           git push || echo "Nothing to push"
