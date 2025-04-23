@@ -4,17 +4,22 @@ permissions:
   contents: write
 
 on:
+  # 1️⃣ Any push to any path
   push:
-    paths:
-      - 'generated_code/**'
-      - 'agents/**'
-      - '*.py'
-      - '**.py'
+
+  # 2️⃣ Trigger when Code Generation Agent completes
+  workflow_run:
+    workflows: ["Code Generation Agent"]
+    types:
+      - completed
+
+  # 3️⃣ Scheduled run every 2 hours
   schedule:
-    - cron: '0 */2 * * *'  # every 2 hours
+    - cron: '0 */2 * * *'
 
 jobs:
   review-code:
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' || github.event_name == 'schedule' }}
     runs-on: ubuntu-latest
 
     steps:
