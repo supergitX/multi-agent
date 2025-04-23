@@ -1,8 +1,8 @@
 # .github/workflows/code_generation.yml
 name: Code Generation Agent
 
-# Grant write permission for pushing commits\N    permissions:
-      contents: write
+permissions:
+  contents: write  # Allow the workflow to push commits
 
 on:
   workflow_dispatch:
@@ -37,8 +37,7 @@ jobs:
       - name: Run code generator
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          python agents/code_generator.py
+        run: python agents/code_generator.py
 
       - name: Git pull before commit
         run: |
@@ -50,4 +49,4 @@ jobs:
         run: |
           git add generated_code/
           git commit -m "🤖 Generated code via Code Generation Agent" || echo "No changes to commit"
-          git push
+          git push || echo "Nothing to push"
