@@ -4,7 +4,9 @@ name: Code Review Agent
 on:
   push:
     paths:
-      - 'generated_code/**'
+      - '**/*.py'
+  schedule:
+    - cron: '0 */2 * * *'  # every 2 hours
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -28,20 +30,14 @@ jobs:
         run: |
           python agents/code_reviewer.py
 
-      - name: Upload review logs
-        uses: actions/upload-artifact@v4
-        with:
-          name: code-review-logs
-          path: review_reports/
-
       - name: Git pull before commit
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git pull origin ${{ github.ref_name }} --rebase
+          git pull origin ${{ github.ref_name }} --rebase || true
 
       - name: Commit flagged code (if any)
         run: |
-          git add flagged_code/ || true
-          git commit -m "🔍 Added flagged code from review" || echo "No flagged code to commit"
+          git add flagged_code/ review_reports/
+          git commit -m "🔍 Added flagged code and review reports" || echo "No flagged files to commit"
           git push || echo "Nothing to push"
