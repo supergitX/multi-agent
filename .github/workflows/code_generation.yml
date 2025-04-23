@@ -1,22 +1,15 @@
-# .github/workflows/code_generation.yml
 name: Code Generation Agent
 
 on:
   workflow_dispatch:
-  issue_comment:
-    types: [created]
   issues:
-    types: [labeled, opened, edited]
-  schedule:
-    - cron: '0 * * * *'  # every hour
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited]
 
 jobs:
   generate-code:
     runs-on: ubuntu-latest
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '/generate-code')) ||
-      (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'code-gen-request')
 
     steps:
       - name: Checkout code
@@ -36,14 +29,11 @@ jobs:
         run: |
           python agents/code_generator.py
 
-      - name: Git pull before commit
+      - name: Commit generated code
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git pull origin ${{ github.ref_name }} --rebase
-
-      - name: Commit generated code
-        run: |
+          git pull origin main || true
           git add generated_code/
-          git commit -m "🤖 Generated code via Code Generation Agent" || echo "No changes to commit"
-          git push
+          git commit -m "🤖 Generated code via Code Generation Agent" || echo "Nothing to commit"
+          git push || echo "Nothing to push"
