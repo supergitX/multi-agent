@@ -15,7 +15,7 @@ on:
 
   # 3️⃣ Scheduled run every 2 hours
   schedule:
-    - cron: '0 */2 * * *'
+   # - cron: '0 */2 * * *'
 
 jobs:
   review-code:
