@@ -14,7 +14,7 @@ on:
       - completed
 
   # 3️⃣ Scheduled run every 2 hours
-  schedule:
+  #schedule:
    # - cron: '0 */2 * * *'
 
 jobs:
