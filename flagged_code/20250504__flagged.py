@@ -1,10 +1,13 @@
-def sort_list(data):
-  """Sorts a list using the built-in sorted() function.
+def sort_list(input_list):
+  """Sorts a list in ascending order.
 
   Args:
-    data: The list to be sorted.
+    input_list: The list to be sorted.
 
   Returns:
-    A new list containing all items from the input list in ascending order.
+    A new list containing all items from the input list, sorted in 
+    ascending order.  Returns an empty list if input is None or empty.
   """
-  return sorted(data)
+  if input_list is None:
+      return []
+  return sorted(input_list)
