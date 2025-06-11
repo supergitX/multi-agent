@@ -1,10 +1,10 @@
 def sort_list(data):
-  """Sorts a list in ascending order.
+  """Sorts a list using the built-in sorted() function.
 
   Args:
-    data: A list of comparable items.
+    data: The list to be sorted.
 
   Returns:
-    A new list containing the elements of the input list, sorted in ascending order.
+    A new list containing all items from the input list in ascending order.
   """
   return sorted(data)
