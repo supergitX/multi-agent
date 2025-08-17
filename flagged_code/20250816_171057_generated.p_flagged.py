@@ -2,9 +2,9 @@ def sort_list(data):
   """Sorts a list in ascending order.
 
   Args:
-    data: A list of comparable items.
+    data: A list of items to be sorted.
 
   Returns:
-    A new list containing the sorted elements of the input list.
+    A new list containing the sorted items.
   """
   return sorted(data)
