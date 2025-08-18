@@ -5,6 +5,6 @@ def sort_list(data):
     data: A list of comparable items.
 
   Returns:
-    A new list containing the sorted elements of the input list.
+    A new list containing the elements of data in sorted order.
   """
   return sorted(data)
