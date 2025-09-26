@@ -1,10 +1,14 @@
-def sort_list(lst):
+def sort_list(input_list):
   """Sorts a list in ascending order.
 
   Args:
-    lst: The list to be sorted.
+    input_list: The list to be sorted.
 
   Returns:
-    A new list containing the elements of the input list in ascending order.
+    A new list containing all items from the input list, sorted in
+    ascending order.  Returns an empty list if the input is None.
   """
-  return sorted(lst)
+  if input_list is None:
+    return []
+
+  return sorted(input_list)
