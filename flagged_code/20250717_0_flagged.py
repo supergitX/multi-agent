@@ -5,6 +5,6 @@ def sort_list(lst):
     lst: The list to be sorted.
 
   Returns:
-    A new list containing the sorted elements of the input list.
+    A new list containing the elements of the input list, sorted in ascending order.
   """
   return sorted(lst)
